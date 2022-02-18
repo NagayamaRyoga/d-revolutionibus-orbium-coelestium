@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/d-revolutionibus-orbium-coelestium
+d-revolutionibus-orbium-coelestium.so
+d-revolutionibus-orbium-coelestium.dylib
+d-revolutionibus-orbium-coelestium.dll
+d-revolutionibus-orbium-coelestium.a
+d-revolutionibus-orbium-coelestium.lib
+d-revolutionibus-orbium-coelestium-test-*
+*.exe
+*.o
+*.obj
+*.lst
