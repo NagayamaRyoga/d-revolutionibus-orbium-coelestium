@@ -1,5 +1,6 @@
 module orbium.screen;
 
+import std.algorithm : fill;
 import std.stdio : File;
 import std.typecons : Tuple;
 import orbium.util.ctor : defaultCtor;
@@ -53,10 +54,20 @@ class Screen
     }
 
     ///
+    void clear()
+    {
+        _pixels.fill(ubyte());
+    }
+
+    ///
     void render(File file)
     {
         const blockWidth = 2;
         const blockHeight = 4;
+
+        string s;
+
+        s ~= "\x1b[2J\x1b[H";
 
         foreach (by; 0 .. ((_height + blockHeight - 1) / blockHeight))
         {
@@ -64,12 +75,12 @@ class Screen
             {
                 ubyte block = 0;
 
-                immutable dots = [
+                immutable DOTS = [
                     Int2(0, 0), Int2(0, 1), Int2(0, 2), Int2(1, 0), Int2(1,
                             1), Int2(1, 2), Int2(0, 3), Int2(1, 3),
                 ];
 
-                foreach (i, dot; dots)
+                foreach (i, dot; DOTS)
                 {
                     const x = bx * blockWidth + dot.x;
                     const y = by * blockHeight + dot.y;
@@ -80,11 +91,12 @@ class Screen
                     }
                 }
 
-                const charCode = dchar(0x2800 | block);
-                file.write(charCode);
+                s ~= dchar(0x2800 | block);
             }
-            file.write('\n');
+            s ~= '\n';
         }
+
+        file.write(s);
         file.flush();
     }
 }
