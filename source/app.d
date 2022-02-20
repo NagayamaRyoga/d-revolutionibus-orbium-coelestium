@@ -1,31 +1,22 @@
 import std.complex : Complex;
 import std.stdio : stderr;
+import orbium.graphics.renderer : Renderer;
 import orbium.screen : Screen;
+import orbium.vec : Float2, Float3;
+import orbium.vertex : Vertex;
 
 void main()
 {
     auto screen = new Screen(256, 256);
+    auto renderer = new Renderer(screen);
 
-    foreach (y; 0 .. screen.height)
-    {
-        foreach (x; 0 .. screen.width)
-        {
-            const u = (cast(float) x / screen.width - 0.5) * 4;
-            const v = (cast(float) y / screen.height - 0.5) * 4;
-            const c = Complex!float(u, v);
+    const Vertex[] vertices = [
+        Vertex(Float3(+0.0, -0.7, 0), Float2()),
+        Vertex(Float3(-0.9, +0.7, 0), Float2()),
+        Vertex(Float3(+0.5, +0.5, 0), Float2()),
+    ];
 
-            Complex!float z = 0;
-            foreach (_; 0 .. 10)
-            {
-                z = z * z + c;
-            }
-
-            if (z.re * z.re + z.im * z.im > 2)
-            {
-                screen.setPixel(x, y, 1);
-            }
-        }
-    }
+    renderer.renderTriangle(vertices[0], vertices[1], vertices[2]);
 
     screen.render(stderr);
 }
