@@ -4,7 +4,7 @@ import std.algorithm : max, min;
 import orbium.matrix : Mat4x4F;
 import orbium.rect : RectF, RectI;
 import orbium.screen : Screen;
-import orbium.vec : Float2, Float3, Int2;
+import orbium.vec : Float2, Float4, Int2;
 import orbium.vertex : Vertex;
 
 ///
@@ -23,11 +23,20 @@ class Renderer
     }
 
     ///
+    void renderPolygon(const Vertex[] vertices)
+    {
+        for (size_t i = 2; i < vertices.length; i++)
+        {
+            renderTriangle(vertices[i - 2], vertices[i - 1], vertices[i - 0]);
+        }
+    }
+
+    ///
     void renderTriangle(inout ref Vertex v1, inout ref Vertex v2, inout ref Vertex v3)
     {
-        const p1 = v1.pos * _transform;
-        const p2 = v2.pos * _transform;
-        const p3 = v3.pos * _transform;
+        const p1 = applyTransform(v1.pos);
+        const p2 = applyTransform(v2.pos);
+        const p3 = applyTransform(v3.pos);
 
         const viewBound = polygonBound(p1, p2, p3);
         const screenBound = toScreenBound(viewBound);
@@ -54,12 +63,24 @@ class Renderer
     }
 
     ///
+    @property Mat4x4F transform() const
+    {
+        return _transform;
+    }
+
+    ///
     @property void transform(Mat4x4F m)
     {
         _transform = m;
     }
 
-    private RectF polygonBound(inout ref Float3 p1, inout ref Float3 p2, inout ref Float3 p3) const
+    private Float4 applyTransform(inout ref Float4 p) const
+    {
+        auto q = p * _transform;
+        return q / q.w;
+    }
+
+    private RectF polygonBound(inout ref Float4 p1, inout ref Float4 p2, inout ref Float4 p3) const
     {
         const l = min(p1.x, p2.x, p3.x).max(_viewRect.left);
         const t = min(p1.y, p2.y, p3.y).max(_viewRect.top);

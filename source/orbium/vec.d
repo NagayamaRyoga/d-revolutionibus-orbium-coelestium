@@ -29,19 +29,27 @@ struct Vec2(T)
 }
 
 ///
-struct Vec3(T)
+struct Vec4(T)
 {
     alias Self = typeof(this);
 
     ///
-    T x, y, z;
+    T x, y, z, w;
 
     ///
-    this(T x, T y, T z)
+    this(T x, T y, T z, T w)
     {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.w = w;
+    }
+
+    ///
+    Self opBinary(string op)(T rhs) const if (op == "*" || op == "/")
+    {
+        return Self(mixin("this.x " ~ op ~ " rhs"), mixin("this.y " ~ op ~ " rhs"),
+                mixin("this.z " ~ op ~ " rhs"), mixin("this.w " ~ op ~ " rhs"));
     }
 
     ///
@@ -53,4 +61,4 @@ struct Vec3(T)
 
 alias Int2 = Vec2!int;
 alias Float2 = Vec2!float;
-alias Float3 = Vec3!float;
+alias Float4 = Vec4!float;

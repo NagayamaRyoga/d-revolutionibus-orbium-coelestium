@@ -1,7 +1,7 @@
 module orbium.matrix;
 
-import std.math : cos, sin;
-import orbium.vec : Vec3;
+import std.math : cos, sin, tan;
+import orbium.vec : Vec4;
 
 ///
 struct Mat4x4(T)
@@ -79,10 +79,12 @@ struct Mat4x4(T)
     }
 
     ///
-    Vec3!T opBinaryRight(string op : "*")(Vec3!T v) const
+    Vec4!T opBinaryRight(string op : "*")(Vec4!T v) const
     {
-        return Vec3!T(v.x * m11 + v.y * m21 + v.z * m31 + m41,
-                v.x * m12 + v.y * m22 + v.z * m32 + m42, v.x * m13 + v.y * m23 + v.z * m33 + m43);
+        return Vec4!T(v.x * m11 + v.y * m21 + v.z * m31 + v.w * m41,
+                v.x * m12 + v.y * m22 + v.z * m32 + v.w * m42,
+                v.x * m13 + v.y * m23 + v.z * m33 + v.w * m43,
+                v.x * m14 + v.y * m24 + v.z * m34 + v.w * m44);
     }
 
     ///
@@ -92,9 +94,9 @@ struct Mat4x4(T)
     }
 
     ///
-    static Self translate(Vec3!T v)
+    static Self translate(T tx, T ty, T tz)
     {
-        return Self(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, v.x, v.y, v.z, 1);
+        return Self(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1);
     }
 
     ///
@@ -119,6 +121,15 @@ struct Mat4x4(T)
         const c = cos(rot);
         const s = sin(rot);
         return Self(c, -s, 0, 0, s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    }
+
+    ///
+    static Self perspectiveFovLH(T fovY, T aspect, T zNear, T zFar)
+    {
+        const sy = 1 / tan(fovY / 2);
+        const sx = sy / aspect;
+        const sz = zFar / (zFar - zNear);
+        return Self(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, -zNear * sz, 0, 0, 1, 0);
     }
 }
 
