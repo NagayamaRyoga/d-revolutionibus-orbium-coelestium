@@ -28,7 +28,7 @@ struct Vec2(T)
     }
 
     ///
-    T dot(Self rhs) const
+    T cross(Self rhs) const
     {
         return x * rhs.y - y * rhs.x;
     }

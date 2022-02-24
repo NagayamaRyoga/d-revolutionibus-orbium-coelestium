@@ -37,29 +37,31 @@ class Renderer
     ///
     void renderTriangle(inout ref Vertex v1, inout ref Vertex v2, inout ref Vertex v3)
     {
-        const p1 = applyTransform(v1.pos);
-        const p2 = applyTransform(v2.pos);
-        const p3 = applyTransform(v3.pos);
+        const p1 = applyTransform(v1);
+        const p2 = applyTransform(v2);
+        const p3 = applyTransform(v3);
 
-        const viewBound = polygonBound(p1, p2, p3);
+        const viewBound = polygonBound(p1.pos, p2.pos, p3.pos);
         const screenBound = toScreenBound(viewBound);
 
-        const a = p2.xy - p1.xy;
-        const b = p3.xy - p1.xy;
-        const axb = a.dot(b);
+        const a = p2.pos.xy - p1.pos.xy;
+        const b = p3.pos.xy - p1.pos.xy;
+        const axb = a.cross(b);
 
         foreach (y; screenBound.top .. screenBound.bottom)
         {
             foreach (x; screenBound.left .. screenBound.right)
             {
                 const p = toViewPos(Int2(x, y));
-                const q = p1.xy - p;
-                const s = -q.dot(b) / axb;
-                const t = q.dot(a) / axb;
+                const q = p1.pos.xy - p;
+                const s = -q.cross(b) / axb;
+                const t = q.cross(a) / axb;
+                const u = 1 - s - t;
 
                 if (0 <= s && s <= 1 && 0 <= t && t <= 1 && s + t <= 1)
                 {
-                    const uv = v1.uv + (v2.uv - v1.uv) * s + (v3.uv - v1.uv) * t;
+                    const w = p1.pos.w * u + p2.pos.w * s + p3.pos.w * t;
+                    const uv = (p1.uv * u + p2.uv * s + p3.uv * t) / w;
                     _target.setPixel(x, y, sampleTexture(uv));
                 }
             }
@@ -90,10 +92,14 @@ class Renderer
         _texture = texture;
     }
 
-    private Float4 applyTransform(inout ref Float4 p) const
+    private Vertex applyTransform(Vertex v) const
     {
-        auto q = p * _transform;
-        return q / q.w;
+        v.pos = v.pos * _transform;
+        const invW = 1 / v.pos.w;
+        v.uv = v.uv * invW;
+        v.pos = v.pos * invW;
+        v.pos.w = invW;
+        return v;
     }
 
     private RectF polygonBound(inout ref Float4 p1, inout ref Float4 p2, inout ref Float4 p3) const

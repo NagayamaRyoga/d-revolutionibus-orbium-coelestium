@@ -37,7 +37,8 @@ void main()
     {
         screen.clear();
 
-        const world = Mat4x4F.rotateY(0.2 * i) * Mat4x4F.translate(0, 0, 5.0);
+        const world = Mat4x4F.rotateY(0.1 * i) * Mat4x4F.translate(0, 0,
+                5 - 0.1 * i) * Mat4x4F.translate(0, 0, 5.0);
         renderer.transform = world * view * projection;
         renderer.renderPolygon(vertices);
 
