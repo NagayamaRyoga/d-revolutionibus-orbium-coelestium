@@ -4,6 +4,7 @@ import std.datetime : msecs;
 import std.math : PI;
 import std.stdio : stderr;
 import orbium.graphics.renderer : Renderer;
+import orbium.image : Image;
 import orbium.matrix : Mat4x4F;
 import orbium.screen : Screen;
 import orbium.vec : Float2, Float4;
@@ -17,15 +18,26 @@ void main()
     auto screen = new Screen(width, height);
     auto renderer = new Renderer(screen);
 
+    auto image = new Image(256, 256, []);
+    foreach (y; 0 .. image.height)
+    {
+        foreach (x; 0 .. image.width)
+        {
+            image.setPixel(x, y, x * x + y * y < 65536);
+        }
+    }
+
     const vertices = [
-        Vertex(Float4(-1, -1, 0, 1), Float2()),
-        Vertex(Float4(-1, +1, 0, 1), Float2()),
-        Vertex(Float4(+1, -1, 0, 1), Float2()),
-        Vertex(Float4(+1, +1, 0, 1), Float2()),
+        Vertex(Float4(-1, -1, 0, 1), Float2(1, 1)),
+        Vertex(Float4(-1, +1, 0, 1), Float2(1, 0)),
+        Vertex(Float4(+1, -1, 0, 1), Float2(0, 1)),
+        Vertex(Float4(+1, +1, 0, 1), Float2(0, 0)),
     ];
 
     const projection = Mat4x4F.perspectiveFovLH(PI * 0.8, aspect, 0.1, 1000);
     const view = Mat4x4F.identity;
+
+    renderer.texture = image;
 
     foreach (i; 0 .. 100)
     {

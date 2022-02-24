@@ -22,6 +22,12 @@ struct Vec2(T)
     }
 
     ///
+    Self opBinary(string op)(T rhs) const if (op == "*" || op == "/")
+    {
+        return Self(mixin("this.x " ~ op ~ " rhs"), mixin("this.y " ~ op ~ " rhs"));
+    }
+
+    ///
     T dot(Self rhs) const
     {
         return x * rhs.y - y * rhs.x;

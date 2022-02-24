@@ -1,6 +1,7 @@
 module orbium.graphics.renderer;
 
 import std.algorithm : max, min;
+import orbium.image : Image;
 import orbium.matrix : Mat4x4F;
 import orbium.rect : RectF, RectI;
 import orbium.screen : Screen;
@@ -13,6 +14,7 @@ class Renderer
     private Screen _target;
     private RectF _viewRect;
     private Mat4x4F _transform;
+    private Image _texture;
 
     ///
     this(Screen target)
@@ -20,6 +22,7 @@ class Renderer
         _target = target;
         _viewRect = RectF(-1, -1, 1, 1);
         _transform = Mat4x4F.identity;
+        _texture = null;
     }
 
     ///
@@ -56,7 +59,8 @@ class Renderer
 
                 if (0 <= s && s <= 1 && 0 <= t && t <= 1 && s + t <= 1)
                 {
-                    _target.setPixel(x, y, 1);
+                    const uv = v1.uv + (v2.uv - v1.uv) * s + (v3.uv - v1.uv) * t;
+                    _target.setPixel(x, y, sampleTexture(uv));
                 }
             }
         }
@@ -72,6 +76,18 @@ class Renderer
     @property void transform(Mat4x4F m)
     {
         _transform = m;
+    }
+
+    ///
+    @property const(Image) texture() const
+    {
+        return _texture;
+    }
+
+    ///
+    @property void texture(Image texture)
+    {
+        _texture = texture;
     }
 
     private Float4 applyTransform(inout ref Float4 p) const
@@ -110,5 +126,18 @@ class Renderer
         const x = u * _viewRect.width + _viewRect.left;
         const y = v * _viewRect.height + _viewRect.top;
         return Float2(x, y);
+    }
+
+    private ubyte sampleTexture(Float2 uv) const
+    {
+        if (_texture is null)
+        {
+            return 0xff;
+        }
+
+        const x = cast(int)(uv.x * _texture.width);
+        const y = cast(int)(uv.y * _texture.height);
+
+        return cast(ubyte) _texture.pixel(x, y);
     }
 }
