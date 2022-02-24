@@ -5,6 +5,7 @@ import std.math : PI;
 import std.stdio : stderr;
 import orbium.graphics.renderer : Renderer;
 import orbium.image : Image;
+import orbium.image.dman : dmanPixels;
 import orbium.matrix : Mat4x4F;
 import orbium.screen : Screen;
 import orbium.vec : Float2, Float4;
@@ -18,14 +19,7 @@ void main()
     auto screen = new Screen(width, height);
     auto renderer = new Renderer(screen);
 
-    auto image = new Image(256, 256, []);
-    foreach (y; 0 .. image.height)
-    {
-        foreach (x; 0 .. image.width)
-        {
-            image.setPixel(x, y, x * x + y * y < 65536);
-        }
-    }
+    auto image = new Image(256, 256, dmanPixels);
 
     const vertices = [
         Vertex(Float4(-1, -1, 0, 1), Float2(1, 1)),

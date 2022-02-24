@@ -7,7 +7,7 @@ class Image
     private uint[] _pixels;
 
     ///
-    this(uint width, uint height, uint[] pixels)
+    this(uint width, uint height, const uint[] pixels)
     {
         _width = width;
         _height = height;
