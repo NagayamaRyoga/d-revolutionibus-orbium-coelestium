@@ -56,12 +56,12 @@ class Renderer
                 const q = p1.pos.xy - p;
                 const s = -q.cross(b) / axb;
                 const t = q.cross(a) / axb;
-                const u = 1 - s - t;
+                const r = 1 - s - t;
 
-                if (0 <= s && s <= 1 && 0 <= t && t <= 1 && s + t <= 1)
+                if (0 <= s && 0 <= t && 0 <= r)
                 {
-                    const w = p1.pos.w * u + p2.pos.w * s + p3.pos.w * t;
-                    const uv = (p1.uv * u + p2.uv * s + p3.uv * t) / w;
+                    const w = p1.pos.w * r + p2.pos.w * s + p3.pos.w * t;
+                    const uv = (p1.uv * r + p2.uv * s + p3.uv * t) / w;
                     _target.setPixel(x, y, sampleTexture(uv));
                 }
             }
